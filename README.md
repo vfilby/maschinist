@@ -71,7 +71,7 @@ bytes:
 `\xd9dSo many comments... so much to say.. I mean... you gotta go out there and give 110%....  every time.`
 
 * `0xD9` -> `0b11011001`
-* `d` -> `0b1100100` or 100, which is the length of the comment text.
+* `d` or `0x64` -> `0b1100100` or 100, which is the length of the comment text.
 
 For contrast in a previous test I used 'TestComment' as the comment text and
 the tag included:
