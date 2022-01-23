@@ -40,27 +40,29 @@ test data to try to work out the underlying encoding:
 
 ## Breaking Down the Binary Format
 
-`\x89\xad__ni_internal\x81\xa6source\xa5other\xa6author\xaeSpecial Author\xa7comment\xd9dSo many comments... so much to say.. I mean... you gotta go out there and give 110%....  every time.\xaadeviceType\xa4LOOP\xa5modes\x96\xaaSpecial FX\xacStabs & Hits\xa8Surround\xa5Synth\xaaTambourine\xacTempo-synced\xa4name\xa8metadata\xa5tempo\xcb\x00\x00\x00\x00\x00\x00\x00\x00\xa5types\x92\x91\xa5Drums\x91\xa7Texture\xa6vendor\xaeAwesome Vendor`
+```
+\x89\xad__ni_internal\x81\xa6source\xa5other\xa6author\xaeSpecial Author\xa7comment\xd9dSo many comments... so much to say.. I mean... you gotta go out there and give 110%....  every time.\xaadeviceType\xa4LOOP\xa5modes\x96\xaaSpecial FX\xacStabs & Hits\xa8Surround\xa5Synth\xaaTambourine\xacTempo-synced\xa4name\xa8metadata\xa5tempo\xcb\x00\x00\x00\x00\x00\x00\x00\x00\xa5types\x92\x91\xa5Drums\x91\xa7Texture\xa6vendor\xaeAwesome Vendor
+```
 
 ### Text values
 One common pattern seems to be that textual sections are preceded by a single 
-byte where the first four bits are constant '1010' (10) and the next four bits
+byte where the first four bits are constant `0x1010` (10) and the next four bits
 represent the length of the value.
 
 For example:
 
 `\xad__ni_internal`
 
-0xAD = 0b10101101 which yields 0b1010 and 0b1101 (10 and 13).  10 appears to be
+`0xAD` = `0b10101101` which yields `0b1010` and `0b1101` (10 and 13).  10 appears to be
 a constant of some sort and 13 is the length of `__ni_internal`
 
 We see this many times in this sample:
 
-* `\xa6source` 0xA6 -> 0b1010 and 0b0110 (10 and 6)
-* `\xa5other` 0xA5 -> 0b1010 and 0b0101 (10 and 5)
-* `\xa6author` 0xA6 -> 0b1010 and 0b0110 (10 and 6)
-* `\xaeSpecial Author` 0xAE -> 0b1010 and 0b1110 (10 and 14)
-* `\xa7comment` 0xA7 -> 0b1010 and 0b0111 (10 and 7)
+* `\xa6source` `0xA6` -> `0b1010` and `0b0110` (10 and 6)
+* `\xa5other` `0xA5` -> `0b1010` and `0b0101` (10 and 5)
+* `\xa6author` `0xA6` -> 0b1010 and `0b0110` (10 and 6)
+* `\xaeSpecial Author` `0xAE` -> `0b1010` and `0b1110` (10 and 14)
+* `\xa7comment` `0xA7` -> `0b1010` and `0b0111` (10 and 7)
 
 One interesting this is the actual comment which is much longer than the 16 
 characters that can be accounted for in 4 bits. The comment is preceded by two
@@ -68,19 +70,21 @@ bytes:
 
 `\xd9dSo many comments... so much to say.. I mean... you gotta go out there and give 110%....  every time.`
 
-* `0xD9` -> 0b11011001
-* `d` -> 0b1100100 or 100, which is the length of the comment text.
+* `0xD9` -> `0b11011001`
+* `d` -> `0b1100100` or 100, which is the length of the comment text.
 
 For contrast in a previous test I used 'TestComment' as the comment text and
 the tag included:
 
 `\xabTestComment`
 
-0xAB -> 0b1010 and 0b1011  (10 and 11)
+`0xAB` -> `0b1010` and `0b1011`  (10 and 11)
 
 So it seems like there is some special case where strings longer than 16 
 characters have an additional marker.
 
 
 
-`\x89\xad__ni_internal\x81\xa6source\xa5other\xa6author\xaeSpecial Author\xa7comment\xd9dSo many comments... so much to say.. I mean... you gotta go out there and give 110%....  every time.\xaadeviceType\xa4LOOP\xa5modes\x96\xaaSpecial FX\xacStabs & Hits\xa8Surround\xa5Synth\xaaTambourine\xacTempo-synced\xa4name\xa8metadata\xa5tempo\xcb\x00\x00\x00\x00\x00\x00\x00\x00\xa5types\x92\x91\xa5Drums\x91\xa7Texture\xa6vendor\xaeAwesome Vendor`
+```
+\x89\xad__ni_internal\x81\xa6source\xa5other\xa6author\xaeSpecial Author\xa7comment\xd9dSo many comments... so much to say.. I mean... you gotta go out there and give 110%....  every time.\xaadeviceType\xa4LOOP\xa5modes\x96\xaaSpecial FX\xacStabs & Hits\xa8Surround\xa5Synth\xaaTambourine\xacTempo-synced\xa4name\xa8metadata\xa5tempo\xcb\x00\x00\x00\x00\x00\x00\x00\x00\xa5types\x92\x91\xa5Drums\x91\xa7Texture\xa6vendor\xaeAwesome Vendor
+```
