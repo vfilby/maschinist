@@ -113,7 +113,7 @@ Nope: the magic byte sequence for Smile isn't present here.
 
 ## MessagePack
 
-```json
+```python
 {
 	b'__ni_internal': {
 			b'source': b'other'
