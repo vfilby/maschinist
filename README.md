@@ -71,7 +71,7 @@ bytes:
 `\xd9dSo many comments... so much to say.. I mean... you gotta go out there and give 110%....  every time.`
 
 * `0xD9` -> `0b11011001`
-* `d` or `0x64` -> `0b1100100` or 100, which is the length of the comment text.
+* `d` or `0x64` -> `0b01100100` or 100, which is the length of the comment text.
 
 For contrast in a previous test I used 'TestComment' as the comment text and
 the tag included:
@@ -87,4 +87,46 @@ characters have an additional marker.
 
 ```
 \x89\xad__ni_internal\x81\xa6source\xa5other\xa6author\xaeSpecial Author\xa7comment\xd9dSo many comments... so much to say.. I mean... you gotta go out there and give 110%....  every time.\xaadeviceType\xa4LOOP\xa5modes\x96\xaaSpecial FX\xacStabs & Hits\xa8Surround\xa5Synth\xaaTambourine\xacTempo-synced\xa4name\xa8metadata\xa5tempo\xcb\x00\x00\x00\x00\x00\x00\x00\x00\xa5types\x92\x91\xa5Drums\x91\xa7Texture\xa6vendor\xaeAwesome Vendor
+```
+
+## Possible Off the Shelf Solutions?
+
+Could be the BINN format? https://github.com/liteserver/binn/blob/master/spec.md
+
+* `0xD9` -> `0b11011001`
+* `d` or `0x64` -> `0b01100100` or 100, which is the length of the comment text.
+
+
+110 11001 01100100
+
+### BSON
+
+Nope. Document size prefix is missing
+
+
+### Smile
+
+https://github.com/FasterXML/smile-format-specification/blob/master/smile-specification.md
+
+Nope: the magic byte sequence for Smile isn't present here.
+
+
+## MessagePack
+
+```json
+{
+	b'__ni_internal': {
+			b'source': b'other'
+	}, 
+	b'author': b'Special Author', 
+	b'comment': b'So many comments... so much to say.. I mean... you gotta go out there and give 110%....  every time.', 
+	b'deviceType': b'LOOP', 
+	b'modes': [b'Special FX', b'Stabs & Hits', b'Surround', b'Synth', b'Tambourine', b'Tempo-synced'], 
+	b'name': b'metadata', 
+	b'tempo': 0.0, 
+	b'types': [
+		[b'Drums'], [b'Texture']
+	], 
+	b'vendor': b'Awesome Vendor'
+}
 ```
