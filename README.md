@@ -132,7 +132,7 @@ At this point I have a partial understanding of the encoding, so let's see if
 we can find a serialization scheme that fits. 
 
 * [Binn](https://github.com/liteserver/binn/blob/master/spec.md):  format kinda fits, but some parts just don't seem to work and I couldn't decode the binary data with a Binn deserializer...  so likely nope.
-* BSON: This one's easy...  the document size prefix is missing.. Nope.
+* [BSON](https://en.wikipedia.org/wiki/BSON): This one's easy...  the document size prefix is missing.. Nope.
 * [Smile](https://github.com/FasterXML/smile-format-specification/blob/master/smile-specification.md) The magic byte sequence for Smile isn't present here... Nope.
 * [MessagePack](https://github.com/msgpack/msgpack/blob/master/spec.md) Very promising, looks like a good match.
 
@@ -153,7 +153,29 @@ b'\x89\xad__ni_internal\x81\xa6source\xa5other\xa6author\xaeSpecial Author\xa7co
 b'\x89\xad__ni_internal\x81\xa6source\xa5other\xa6author\xaeSpecial Author\xa7comment\xda\x00dSo many comments... so much to say.. I mean... you gotta go out there and give 110%....  every time.\xaadeviceType\xa4LOOP\xa5modes\x96\xaaSpecial FX\xacStabs & Hits\xa8Surround\xa5Synth\xaaTambourine\xacTempo-synced\xa4name\xa8metadata\xa5tempo\xcb\x00\x00\x00\x00\x00\x00\x00\x00\xa5types\x92\x91\xa5Drums\x91\xa7Texture\xa6vendor\xaeAwesome Vendor'
 ```
 
-Not perfect... but very close.  I think we have a winner.
+Not perfect... but very close.  
+
+The only difference is The encoding of the comment. The original was 
+`\xd9dSo many comments... ` and the reencoded version is 
+`\xda\x00dSo many comments... `. Looking at the msgpack spec the only difference
+is that the re-encoded version used two bytes to represent the string length
+instead of one.
+
+As per the [msgpack spec on strings](https://github.com/msgpack/msgpack/blob/master/spec.md#str-format-family):
+
+```
+str 8 stores a byte array whose length is upto (2^8)-1 bytes:
++--------+--------+========+
+|  0xd9  |YYYYYYYY|  data  |
++--------+--------+========+
+
+str 16 stores a byte array whose length is upto (2^16)-1 bytes:
++--------+--------+--------+========+
+|  0xda  |ZZZZZZZZ|ZZZZZZZZ|  data  |
++--------+--------+--------+========+
+```
+
+I think we have a winner.
 
 ```python
 {
